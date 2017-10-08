@@ -1,0 +1,19 @@
+{
+  "scripts": {
+    "start": "nodemon ./server.js --exec babel-node -e js"
+  },
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.1",
+    "graphql": "^0.11.7",
+    "graphql-server-express": "^1.1.3",
+    "graphql-tools": "^2.2.1",
+    "isomorphic-fetch": "^2.2.1"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.0",
+    "babel-preset-stage-0": "^6.24.1",
+    "nodemon": "^1.12.1"
+  }
+}
