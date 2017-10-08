@@ -23,7 +23,7 @@ server.use('/graphiql', bodyParser.json(), graphiqlExpress({
 
 const ws = createServer(server);
 ws.listen(process.env.PORT || 3000, () => {
-  console.log(`graphQL server is now running on port ${process.env.PORT}.
+  console.log(`graphQL server is now running on port ${process.env.PORT || 3000}.
     Use /graphiql for visual interaction.`)
 
   new SubscriptionServer({

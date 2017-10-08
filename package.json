@@ -3,7 +3,7 @@
     "watch": "nodemon ./server.js --exec babel-node -e js",
     "clean": "rm -rf build && mkdir build",
     "build": "npm run clean && babel -d ./build ./*.js",
-    "start": "npm build && node ./build/server.js"
+    "start": "npm run build && node ./build/server.js"
   },
   "dependencies": {
     "body-parser": "^1.18.2",

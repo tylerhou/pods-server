@@ -35,7 +35,7 @@ server.use('/graphiql', _bodyParser2.default.json(), (0, _graphqlServerExpress.g
 
 var ws = (0, _http.createServer)(server);
 ws.listen(process.env.PORT || 3000, function () {
-  console.log('graphQL server is now running on port ' + process.env.PORT + '.\n    Use /graphiql for visual interaction.');
+  console.log('graphQL server is now running on port ' + (process.env.PORT || 3000) + '.\n    Use /graphiql for visual interaction.');
 
   new _subscriptionsTransportWs.SubscriptionServer({
     execute: _graphql.execute, subscribe: _graphql.subscribe, schema: _schema2.default

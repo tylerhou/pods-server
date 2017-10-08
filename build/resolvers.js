@@ -62,7 +62,6 @@ var resolvers = exports.resolvers = {
         };
         var pod = getPodById(args.pod_id);
         pod.songs.push(song);
-        console.log('asd');
         pubsub.publish('podChanged', { podChanged: pod, pod_id: pod.id });
         return song;
       }).catch(function (error) {
