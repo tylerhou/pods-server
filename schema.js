@@ -25,6 +25,7 @@ const typeDefs = `
     addPod(name: String!): Pod
     addSong(pod_id: ID!, track_id: String!): Song
     popSong(song_id: ID!, pod_id: ID!): Song
+    clearPods: [Pod]
   }
 `
 

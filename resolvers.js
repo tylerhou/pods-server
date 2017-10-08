@@ -1,6 +1,6 @@
 import "isomorphic-fetch";
 
-const pods = [{
+let pods = [{
   id: 0,
   name: 'testing',
   songs: [],
@@ -53,6 +53,11 @@ export const resolvers = {
         return first;
       }
     },
+    clearPods: () => {
+      let old_pods = pods;
+      pods = []; nextPodId = 0;  nextSongId = 0;
+      return old_pods;
+    }
   },
 };
 
