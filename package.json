@@ -1,6 +1,9 @@
 {
   "scripts": {
-    "start": "nodemon ./server.js --exec babel-node -e js"
+    "watch": "nodemon ./server.js --exec babel-node -e js",
+    "clean": "rm -rf build && mkdir build",
+    "build": "npm run clean && babel -d ./build ./*.js",
+    "start": "node ./build/server.js"
   },
   "dependencies": {
     "body-parser": "^1.18.2",
@@ -15,5 +18,6 @@
     "babel-preset-env": "^1.6.0",
     "babel-preset-stage-0": "^6.24.1",
     "nodemon": "^1.12.1"
-  }
+  },
+  "main": "./build/server.js"
 }
