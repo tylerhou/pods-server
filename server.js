@@ -14,7 +14,7 @@ server.use('/graphiql', bodyParser.json(), graphiqlExpress({
   endpointURL: '/graphql'
 }));
 
-server.listen(3000, () =>
-  console.log(`graphQL server is now running on port 3000.
+server.listen(process.env.PORT || 3000, () =>
+  console.log(`graphQL server is now running on port ${process.env.PORT}.
     Use /graphiql for visual interaction.`)
 );
