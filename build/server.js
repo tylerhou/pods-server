@@ -10,9 +10,13 @@ var _bodyParser = require('body-parser');
 
 var _bodyParser2 = _interopRequireDefault(_bodyParser);
 
+var _fs = require('fs');
+
+var _fs2 = _interopRequireDefault(_fs);
+
 var _graphql = require('graphql');
 
-var _http = require('http');
+var _https = require('https');
 
 var _subscriptionsTransportWs = require('subscriptions-transport-ws');
 
@@ -30,11 +34,17 @@ server.use('/graphql', _bodyParser2.default.json(), (0, _graphqlServerExpress.gr
 
 server.use('/graphiql', _bodyParser2.default.json(), (0, _graphqlServerExpress.graphiqlExpress)({
   endpointURL: '/graphql',
-  subscriptionsEndpoint: process.env.PORT ? 'ws://calhacks-pods.azurewebsites.net/subscriptions' : 'ws://localhost:3000/subscriptions'
+  subscriptionsEndpoint: 'wss://www.calhacks-pods.com/subscriptions'
 }));
 
-var ws = (0, _http.createServer)(server);
-ws.listen(process.env.PORT || 3000, function () {
+var options = {
+  key: _fs2.default.readFileSync('/etc/letsencrypt/live/www.calhacks-pods.com/privkey.pem'),
+  cert: _fs2.default.readFileSync('/etc/letsencrypt/live/www.calhacks-pods.com/fullchain.pem'),
+  ca: _fs2.default.readFileSync('/etc/letsencrypt/live/www.calhacks-pods.com/chain.pem')
+};
+
+var ws = (0, _https.createServer)(options, server);
+ws.listen(443, function () {
   console.log('graphQL server is now running on port ' + (process.env.PORT || 3000) + '.\n    Use /graphiql for visual interaction.');
 
   new _subscriptionsTransportWs.SubscriptionServer({
