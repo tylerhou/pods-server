@@ -14,6 +14,8 @@ const typeDefs = `
     id: ID!
     name: String!
     songs: [Song]
+    playing: Boolean!
+    time_offset: Int!
   }
 
   type Query {
@@ -26,6 +28,13 @@ const typeDefs = `
     addSong(pod_id: ID!, track_id: String!): Song
     popSong(song_id: ID!, pod_id: ID!): Song
     clearPods: [Pod]
+    changePlaying(pod_id: ID!, playing: Boolean!): Boolean!
+    seekPod(pod_id: ID!, time: Int!): Int!
+  }
+
+  type Subscription {
+    podChanged(pod_id: ID!): Pod!
+    podListChanged: [Pod]
   }
 `
 

@@ -1,9 +1,14 @@
 import "isomorphic-fetch";
+import { PubSub, withFilter } from 'graphql-subscriptions';
+
+const pubsub = new PubSub();
 
 let pods = [{
   id: 0,
   name: 'testing',
   songs: [],
+  playing: true,
+  time_offset: 0,
 }]
 let nextPodId = 1;
 let nextSongId = 0;
@@ -28,8 +33,9 @@ export const resolvers = {
   },
   Mutation: {
     addPod: (root, args) => {
-      const pod = { id: nextPodId++, name: args.name, songs: [] };
+      const pod = { id: nextPodId++, name: args.name, songs: [], playing: true, time_offset: 0 };
       pods.push(pod);
+      pubsub.publish('podListChanged', { podListChanged: pods });
       return pod;
     },
     addSong: (root, args) => {
@@ -42,23 +48,53 @@ export const resolvers = {
         };
         const pod = getPodById(args.pod_id);
         pod.songs.push(song);
+        console.log('asd');
+        pubsub.publish('podChanged', { podChanged: pod, pod_id: pod.id });
         return song;
-      }).catch(error => null);
+      }).catch(error => console.log(error));
     },
     popSong: (root, args) => {
       const pod = getPodById(args.pod_id);
       const [first, ...rest] = pod.songs;
       if (first.id == args.song_id) {
         pod.songs = rest || [];
+        pubsub.publish('podChanged', { podChanged: pod, pod_id: pod.id });
         return first;
       }
     },
     clearPods: () => {
       let old_pods = pods;
-      pods = []; nextPodId = 0;  nextSongId = 0;
+      pods = [];
+      pubsub.publish('podListChanged', { podListChanged: pods });
       return old_pods;
-    }
+    },
+    changePlaying: (root, args) => {
+      const pod = getPodById(args.pod_id);
+      pod.playing = args.playing;
+      pubsub.publish('podChanged', { podChanged: pod, pod_id: pod.id });
+      return pod;
+    },
+    seekPod: (root, args) => {
+      const pod = getPodById(args.pod_id);
+      pod.time_offset = args.time;
+      pubsub.publish('podChanged', { podChanged: pod, pod_id: pod.id });
+      return pod;
+    },
   },
+  Subscription: {
+    podListChanged: {
+      subscribe: withFilter(
+        () => pubsub.asyncIterator('podListChanged'),
+        () => true
+      )
+    },
+    podChanged: {
+      subscribe: withFilter(
+        () => pubsub.asyncIterator('podChanged'),
+        (payload, variables) => payload.pod_id == variables.pod_id
+      ),
+    }
+  }
 };
 
 export default resolvers;
