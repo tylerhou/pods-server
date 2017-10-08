@@ -7,12 +7,18 @@ exports.resolvers = undefined;
 
 require('isomorphic-fetch');
 
+var _graphqlSubscriptions = require('graphql-subscriptions');
+
 function _toArray(arr) { return Array.isArray(arr) ? arr : Array.from(arr); }
+
+var pubsub = new _graphqlSubscriptions.PubSub();
 
 var _pods = [{
   id: 0,
   name: 'testing',
-  songs: []
+  songs: [],
+  playing: true,
+  time_offset: 0
 }];
 var nextPodId = 1;
 var nextSongId = 0;
@@ -41,8 +47,9 @@ var resolvers = exports.resolvers = {
   },
   Mutation: {
     addPod: function addPod(root, args) {
-      var pod = { id: nextPodId++, name: args.name, songs: [] };
+      var pod = { id: nextPodId++, name: args.name, songs: [], playing: true, time_offset: 0 };
       _pods.push(pod);
+      pubsub.publish('podListChanged', { podListChanged: _pods });
       return pod;
     },
     addSong: function addSong(root, args) {
@@ -55,9 +62,11 @@ var resolvers = exports.resolvers = {
         };
         var pod = getPodById(args.pod_id);
         pod.songs.push(song);
+        console.log('asd');
+        pubsub.publish('podChanged', { podChanged: pod, pod_id: pod.id });
         return song;
       }).catch(function (error) {
-        return null;
+        return console.log(error);
       });
     },
     popSong: function popSong(root, args) {
@@ -69,8 +78,43 @@ var resolvers = exports.resolvers = {
 
       if (first.id == args.song_id) {
         pod.songs = rest || [];
+        pubsub.publish('podChanged', { podChanged: pod, pod_id: pod.id });
         return first;
       }
+    },
+    clearPods: function clearPods() {
+      var old_pods = _pods;
+      _pods = [];
+      pubsub.publish('podListChanged', { podListChanged: _pods });
+      return old_pods;
+    },
+    changePlaying: function changePlaying(root, args) {
+      var pod = getPodById(args.pod_id);
+      pod.playing = args.playing;
+      pubsub.publish('podChanged', { podChanged: pod, pod_id: pod.id });
+      return pod;
+    },
+    seekPod: function seekPod(root, args) {
+      var pod = getPodById(args.pod_id);
+      pod.time_offset = args.time;
+      pubsub.publish('podChanged', { podChanged: pod, pod_id: pod.id });
+      return pod;
+    }
+  },
+  Subscription: {
+    podListChanged: {
+      subscribe: (0, _graphqlSubscriptions.withFilter)(function () {
+        return pubsub.asyncIterator('podListChanged');
+      }, function () {
+        return true;
+      })
+    },
+    podChanged: {
+      subscribe: (0, _graphqlSubscriptions.withFilter)(function () {
+        return pubsub.asyncIterator('podChanged');
+      }, function (payload, variables) {
+        return payload.pod_id == variables.pod_id;
+      })
     }
   }
 };
