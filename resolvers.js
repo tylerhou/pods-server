@@ -71,13 +71,13 @@ export const resolvers = {
       const pod = getPodById(args.pod_id);
       pod.playing = args.playing;
       pubsub.publish('podChanged', { podChanged: pod, pod_id: pod.id });
-      return pod;
+      return pod.playing;
     },
     seekPod: (root, args) => {
       const pod = getPodById(args.pod_id);
       pod.time_offset = args.time;
       pubsub.publish('podChanged', { podChanged: pod, pod_id: pod.id });
-      return pod;
+      return pod.time_offset;
     },
   },
   Subscription: {
